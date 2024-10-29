@@ -14,7 +14,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { PRODUCT_SERVICE } from 'src/config/service';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
-import { PaginationDto, RpcCustomExceptionFilter } from 'src/core';
+import { PaginationDto } from 'src/core';
 import { catchError, firstValueFrom } from 'rxjs';
 
 @Controller('products')
