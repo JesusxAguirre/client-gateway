@@ -1,1 +1,12 @@
-export class CreateOrderDto {}
+import { IsArray, ArrayMinSize, ValidateNested } from 'class-validator';
+import { OrderStatusList, OrderStatus } from '../enum/order.enum';
+import { Type } from 'class-transformer';
+import { OrderItemDto } from './order-item.dto';
+
+export class CreateOrderDto {
+  @IsArray()
+  @ArrayMinSize(1)
+  @ValidateNested({ each: true })
+  @Type(() => OrderItemDto)
+  items: OrderItemDto[];
+}
