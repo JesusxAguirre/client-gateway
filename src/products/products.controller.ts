@@ -12,32 +12,30 @@ import {
 } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { PRODUCT_SERVICE } from 'src/config/service';
+import { NATS_SERVICE } from 'src/config/service';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { PaginationDto } from 'src/core';
 import { catchError, firstValueFrom } from 'rxjs';
 
 @Controller('products')
 export class ProductsController {
-  constructor(
-    @Inject(PRODUCT_SERVICE) private readonly productsClient: ClientProxy,
-  ) {}
+  constructor(@Inject(NATS_SERVICE) private readonly client: ClientProxy) {}
 
   @Post()
   create(@Body() createProductDto: CreateProductDto) {
-    return this.productsClient.send('create', createProductDto);
+    return this.client.send('create', createProductDto);
   }
 
   @Get()
   findAll(@Query() paginationDto: PaginationDto) {
-    return this.productsClient.send('find_all', paginationDto);
+    return this.client.send('find_all', paginationDto);
   }
 
   @Get(':id')
   async findOne(@Param('id', ParseUUIDPipe) id: string) {
     try {
       const product = await firstValueFrom(
-        this.productsClient.send('find_one', { id }),
+        this.client.send('find_one', { id }),
       );
       return product;
     } catch (error) {
@@ -50,7 +48,7 @@ export class ProductsController {
     @Param('id') id: string,
     @Body() updateProductDto: UpdateProductDto,
   ) {
-    return this.productsClient.send('update', { id, ...updateProductDto }).pipe(
+    return this.client.send('update', { id, ...updateProductDto }).pipe(
       catchError((error) => {
         throw new RpcException(error);
       }),
@@ -59,7 +57,7 @@ export class ProductsController {
 
   @Delete(':id')
   remove(@Param('id', ParseUUIDPipe) id: string) {
-    return this.productsClient.send('remove', { id }).pipe(
+    return this.client.send('remove', { id }).pipe(
       catchError((error) => {
         throw new RpcException(error);
       }),
